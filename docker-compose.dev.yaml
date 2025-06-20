@@ -1,0 +1,16 @@
+services:
+  db:
+    image: postgres:16
+    restart: unless-stopped
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_USER=mrfixit
+      - POSTGRES_PASSWORD=mrfixit
+      - POSTGRES_DB=mrfixit
+
+  redis:
+      image: redis:latest
+      restart: unless-stopped
+      ports:
+        - 6379:6379
