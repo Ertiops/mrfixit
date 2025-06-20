@@ -1,0 +1,16 @@
+version: '3.8'
+
+services:
+  mrfixit:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: mrfixit_app
+    env_file:
+      - .env
+    ports:
+      - "8000:8000"
+    restart: unless-stopped
+
+  redis:
+      image: redis:latest
