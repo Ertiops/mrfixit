@@ -5,6 +5,7 @@ from aiomisc_log import LogFormat, LogLevel, basic_config
 
 from mrfixit.config import MainConfig
 from mrfixit.presenters.bot.service import TelegramBotService
+from mrfixit.presenters.bot.services.tech_request_cron import TechRequestCronService
 
 log = logging.getLogger(__name__)
 
@@ -16,6 +17,7 @@ def main() -> None:
 
     services: list[Service] = [
         TelegramBotService(config=config),
+        TechRequestCronService(config=config),
     ]
 
     with entrypoint(
