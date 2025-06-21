@@ -1,7 +1,7 @@
 from typing import Any
 
 from aiogram.types import CallbackQuery
-from aiogram_dialog import DialogManager, StartMode
+from aiogram_dialog import DialogManager, ShowMode, StartMode
 from aiogram_dialog.widgets.kbd import Button, Select
 
 from mrfixit.domains.entities.tech_request import (
@@ -32,7 +32,10 @@ async def on_building_selected(
     **kwargs: Any,
 ) -> None:
     manager.dialog_data["building"] = item_id
-    await manager.switch_to(CreateTechRequestState.category)
+    await manager.switch_to(
+        state=CreateTechRequestState.category,
+        show_mode=ShowMode.DELETE_AND_SEND,
+    )
 
 
 async def on_category_selected(
@@ -43,7 +46,10 @@ async def on_category_selected(
     **kwargs: Any,
 ) -> None:
     manager.dialog_data["category"] = item_id
-    await manager.switch_to(CreateTechRequestState.title)
+    await manager.switch_to(
+        state=CreateTechRequestState.title,
+        show_mode=ShowMode.DELETE_AND_SEND,
+    )
 
 
 async def on_tech_request_clicked(
@@ -56,5 +62,6 @@ async def on_tech_request_clicked(
     await manager.start(
         state=GetTechRequestState.view,
         mode=StartMode.RESET_STACK,
+        show_mode=ShowMode.SEND,
         data={"request_id": item_id},
     )

@@ -49,31 +49,37 @@ async def get_tech_request_list_context(
             input_dto=TechRequestListParams(limit=100, offset=0)
         )
 
-    grouped: dict[TechRequestBuilding, list] = defaultdict(list)
+    grouped: dict[TechRequestBuilding, dict[str, list]] = defaultdict(
+        lambda: {"urgent": [], "ordinary": [], "done": []}
+    )
     text_lines: list[str] = []
 
     for req in all_requests.items:
         emoji = "🔴" if req.category == TechRequestCategory.URGENT else "🔵"
-        item_dict = dict(
-            id=str(req.id),
-            title=req.title,
-            emoji=emoji,
-        )
-        grouped[req.building].append((req, item_dict))
+        item_dict = dict(id=str(req.id), title=req.title, emoji=emoji)
+
+        if req.status == TechRequestStatus.DONE:
+            grouped[req.building]["done"].append((req, item_dict))
+        elif req.category == TechRequestCategory.URGENT:
+            grouped[req.building]["urgent"].append((req, item_dict))
+        else:
+            grouped[req.building]["ordinary"].append((req, item_dict))
 
     for building in TechRequestBuilding:
         title = BUILDING_ITEMS[building]
         text_lines.append(f"<b>{title}</b>")
-        for req, _ in sorted(
-            grouped.get(building, []), key=lambda pair: pair[0].created_at
-        ):
-            text_lines.append(format_tech_request_line(req))
+
+        for section in ("urgent", "ordinary", "done"):
+            for req, _ in sorted(
+                grouped[building][section], key=lambda pair: pair[0].created_at
+            ):
+                text_lines.append(format_tech_request_line(req))
 
     def serialize(building: TechRequestBuilding) -> list[dict]:
         return [
             item_dict
-            for req, item_dict in grouped.get(building, [])
-            if req.status != TechRequestStatus.DONE
+            for section in ("urgent", "ordinary")
+            for _, item_dict in grouped[building][section]
         ]
 
     return dict(
