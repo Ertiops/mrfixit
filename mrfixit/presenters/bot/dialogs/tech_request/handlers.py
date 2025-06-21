@@ -1,5 +1,5 @@
 from aiogram.types import CallbackQuery, Message
-from aiogram_dialog import DialogManager, StartMode
+from aiogram_dialog import DialogManager, ShowMode, StartMode
 from aiogram_dialog.widgets.input import MessageInput
 from aiogram_dialog.widgets.kbd import Button
 
@@ -26,7 +26,10 @@ async def on_title_input(
         return
     manager.dialog_data["title"] = message.text.strip()
     await message.delete()
-    await manager.switch_to(CreateTechRequestState.description)
+    await manager.switch_to(
+        state=CreateTechRequestState.description,
+        show_mode=ShowMode.SEND,
+    )
 
 
 async def on_description_input(
@@ -38,7 +41,10 @@ async def on_description_input(
         return
     manager.dialog_data["description"] = message.text.strip()
     await message.delete()
-    await manager.switch_to(CreateTechRequestState.photo)
+    await manager.switch_to(
+        state=CreateTechRequestState.photo,
+        show_mode=ShowMode.SEND,
+    )
 
 
 async def on_photo_input(
@@ -47,11 +53,15 @@ async def on_photo_input(
     if not message.photo:
         warning = await message.answer("❗️Пожалуйста, отправьте фотографию.")
         delete_later(warning)
+        await manager.show(show_mode=ShowMode.DELETE_AND_SEND)
         return
 
     manager.dialog_data["file_id"] = message.photo[-1].file_id
     await message.delete()
-    await manager.switch_to(CreateTechRequestState.confirm)
+    await manager.switch_to(
+        state=CreateTechRequestState.confirm,
+        show_mode=ShowMode.SEND,
+    )
 
 
 async def on_create_tech_request(
@@ -73,7 +83,9 @@ async def on_create_tech_request(
         )
     result_msg = await callback.message.answer("✅ Заявка успешно создана.")  # type: ignore[union-attr]
     delete_later(result_msg)
-    await manager.done()
+    await manager.done(
+        show_mode=ShowMode.DELETE_AND_SEND,
+    )
 
 
 async def on_cancel_create_tech_request(
@@ -84,6 +96,7 @@ async def on_cancel_create_tech_request(
     await manager.start(
         state=TechRequestListState.view,
         mode=StartMode.RESET_STACK,
+        show_mode=ShowMode.SEND,
     )
 
 
@@ -95,6 +108,7 @@ async def on_cancel_view_clicked(
     await manager.start(
         state=TechRequestListState.view,
         mode=StartMode.RESET_STACK,
+        show_mode=ShowMode.SEND,
     )
 
 
@@ -121,4 +135,5 @@ async def on_mark_as_done_clicked(
     await manager.start(
         state=TechRequestListState.view,
         mode=StartMode.RESET_STACK,
+        show_mode=ShowMode.SEND,
     )

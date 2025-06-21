@@ -31,11 +31,13 @@ from mrfixit.presenters.bot.dialogs.tech_request.selections import (
     on_category_selected,
     on_tech_request_clicked,
 )
+from mrfixit.presenters.bot.dialogs.utils.handlers import on_unexpected_input
 
 
 def building_selection_window() -> Window:
     return Window(
         Const("🏢 Выберите здание:"),
+        MessageInput(on_unexpected_input, content_types=ContentType.ANY),
         Select(
             id="building_select",
             items=BUILDING_ITEMS.items(),  # type: ignore[arg-type]
@@ -51,6 +53,7 @@ def building_selection_window() -> Window:
 def category_selection_window() -> Window:
     return Window(
         Const("🏷 Выберите категорию:"),
+        MessageInput(on_unexpected_input, content_types=ContentType.ANY),
         Select(
             id="category_select",
             items=CATEGORY_ITEMS.items(),  # type: ignore[arg-type]
@@ -82,13 +85,14 @@ def description_input_window() -> Window:
 def photo_input_window() -> Window:
     return Window(
         Const("📸 Отправьте фотографию:"),
-        MessageInput(on_photo_input),
+        MessageInput(on_photo_input, content_types=ContentType.ANY),
         state=CreateTechRequestState.photo,
     )
 
 
 def request_preview_window() -> Window:
     return Window(
+        MessageInput(on_unexpected_input, content_types=ContentType.ANY),
         Format(
             "🧾 Предпросмотр заявки:\n\n"
             "🏢 Здание: {building}\n"
@@ -142,6 +146,7 @@ def tech_request_list_window() -> Window:
 
 def tech_request_view_window() -> Window:
     return Window(
+        MessageInput(on_unexpected_input, content_types=ContentType.ANY),
         DynamicMedia("photo"),
         Format(
             "<b>📝 Заявка</b>\n\n"
