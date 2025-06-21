@@ -37,52 +37,6 @@ async def get_tech_request_preview(
     )
 
 
-# async def get_tech_request_list_context(
-#     dialog_manager: DialogManager, **kwargs: Any
-# ) -> dict[str, Any]:
-#     container = dialog_manager.middleware_data["dishka_container"]
-#     service: TechRequestService = await container.get(TechRequestService)
-#     uow: AbstractUow = await container.get(AbstractUow)
-
-#     async with uow:
-#         all_requests = await service.get_list(
-#             input_dto=TechRequestListParams(limit=100, offset=0)
-#         )
-
-#     grouped: dict[TechRequestBuilding, list] = defaultdict(list)
-#     text_lines: list[str] = []
-
-#     for req in all_requests.items:
-#         emoji = "🔴" if req.category == TechRequestCategory.URGENT else "🔵"
-#         item_dict = dict(
-#             id=str(req.id),
-#             title=req.title,
-#             emoji=emoji,
-#         )
-#         grouped[req.building].append((req, item_dict))
-
-#     for building in TechRequestBuilding:
-#         title = BUILDING_ITEMS[building]
-#         text_lines.append(f"<b>{title}</b>")
-#         for req, _ in sorted(
-#             grouped.get(building, []), key=lambda pair: pair[0].created_at
-#         ):
-#             text_lines.append(format_tech_request_line(req))
-
-#     def serialize(building: TechRequestBuilding) -> list[dict]:
-#         return [
-#             item_dict
-#             for req, item_dict in grouped.get(building, [])
-#             if req.status != TechRequestStatus.DONE
-#         ]
-
-#     return dict(
-#         text="\n".join(text_lines),
-#         fountain_requests=serialize(TechRequestBuilding.FONTAN),
-#         fort_dialog_requests=serialize(TechRequestBuilding.FORT_DIALOG),
-#     )
-
-
 async def get_tech_request_list_context(
     dialog_manager: DialogManager, **kwargs: Any
 ) -> dict[str, Any]:
