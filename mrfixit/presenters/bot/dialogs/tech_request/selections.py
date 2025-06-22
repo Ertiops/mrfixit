@@ -8,6 +8,7 @@ from mrfixit.domains.entities.tech_request import (
     TechRequestBuilding,
     TechRequestCategory,
 )
+from mrfixit.presenters.bot.content.buttons import tech_request as tech_request_btn
 from mrfixit.presenters.bot.dialogs.states import (
     CreateTechRequestState,
     GetTechRequestState,
@@ -19,8 +20,8 @@ CATEGORY_ITEMS: dict[TechRequestCategory, str] = {
 }
 
 BUILDING_ITEMS: dict[TechRequestBuilding, str] = {
-    TechRequestBuilding.FONTAN: "Фонтан",
-    TechRequestBuilding.FORT_DIALOG: "Форт Диалог",
+    TechRequestBuilding.FOUNTAIN: tech_request_btn.FOUNTAIN,
+    TechRequestBuilding.FORT_DIALOG: tech_request_btn.FORT_DIALOG,
 }
 
 

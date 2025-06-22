@@ -33,7 +33,7 @@ async def test__create(
         description="test_description",
         category=TechRequestCategory.URGENT,
         status=TechRequestStatus.CREATED,
-        building=TechRequestBuilding.FONTAN,
+        building=TechRequestBuilding.FOUNTAIN,
         file_id="test_file_id",
     )
     user = await tech_request_storage.create(input_dto=create_data)
@@ -82,17 +82,17 @@ async def test__get_list(
     parameters = (
         dict(
             category=TechRequestCategory.URGENT,
-            building=TechRequestBuilding.FONTAN,
+            building=TechRequestBuilding.FOUNTAIN,
             status=TechRequestStatus.CREATED,
         ),
         dict(
             category=TechRequestCategory.ORDINARY,
-            building=TechRequestBuilding.FONTAN,
+            building=TechRequestBuilding.FOUNTAIN,
             status=TechRequestStatus.CREATED,
         ),
         dict(
             category=TechRequestCategory.ORDINARY,
-            building=TechRequestBuilding.FONTAN,
+            building=TechRequestBuilding.FOUNTAIN,
             status=TechRequestStatus.DONE,
         ),
         dict(
@@ -140,17 +140,17 @@ async def test__get_list__validate_limit(
     parameters = (
         dict(
             category=TechRequestCategory.URGENT,
-            building=TechRequestBuilding.FONTAN,
+            building=TechRequestBuilding.FOUNTAIN,
             status=TechRequestStatus.CREATED,
         ),
         dict(
             category=TechRequestCategory.ORDINARY,
-            building=TechRequestBuilding.FONTAN,
+            building=TechRequestBuilding.FOUNTAIN,
             status=TechRequestStatus.CREATED,
         ),
         dict(
             category=TechRequestCategory.ORDINARY,
-            building=TechRequestBuilding.FONTAN,
+            building=TechRequestBuilding.FOUNTAIN,
             status=TechRequestStatus.DONE,
         ),
         dict(
@@ -201,17 +201,17 @@ async def test__get_list__validate_offset(
     parameters = (
         dict(
             category=TechRequestCategory.URGENT,
-            building=TechRequestBuilding.FONTAN,
+            building=TechRequestBuilding.FOUNTAIN,
             status=TechRequestStatus.CREATED,
         ),
         dict(
             category=TechRequestCategory.ORDINARY,
-            building=TechRequestBuilding.FONTAN,
+            building=TechRequestBuilding.FOUNTAIN,
             status=TechRequestStatus.CREATED,
         ),
         dict(
             category=TechRequestCategory.ORDINARY,
-            building=TechRequestBuilding.FONTAN,
+            building=TechRequestBuilding.FOUNTAIN,
             status=TechRequestStatus.DONE,
         ),
         dict(
@@ -312,7 +312,7 @@ async def test__update_by_id(
         description="test_description",
         category=TechRequestCategory.URGENT,
         status=TechRequestStatus.CREATED,
-        building=TechRequestBuilding.FONTAN,
+        building=TechRequestBuilding.FOUNTAIN,
         file_id="test_file_id",
     )
     tech_request = await tech_request_storage.update_by_id(input_dto=update_data)
@@ -338,7 +338,7 @@ async def test__update_by_id__entity_not_found_exception(
         description="test_description",
         category=TechRequestCategory.URGENT,
         status=TechRequestStatus.CREATED,
-        building=TechRequestBuilding.FONTAN,
+        building=TechRequestBuilding.FOUNTAIN,
         file_id="test_file_id",
     )
     with pytest.raises(EntityNotFoundException):

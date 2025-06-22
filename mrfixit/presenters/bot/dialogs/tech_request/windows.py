@@ -5,6 +5,9 @@ from aiogram_dialog.widgets.kbd import Button, Group, Row, Select
 from aiogram_dialog.widgets.media import DynamicMedia
 from aiogram_dialog.widgets.text import Const, Format
 
+from mrfixit.presenters.bot.content.buttons import common as common_btn
+from mrfixit.presenters.bot.content.buttons import tech_request as tech_request_btn
+from mrfixit.presenters.bot.content.messages import tech_request as tech_request_msg
 from mrfixit.presenters.bot.dialogs.states import (
     CreateTechRequestState,
     GetTechRequestState,
@@ -36,7 +39,7 @@ from mrfixit.presenters.bot.dialogs.utils.handlers import on_unexpected_input
 
 def building_selection_window() -> Window:
     return Window(
-        Const("🏢 Выберите здание:"),
+        Const(tech_request_btn.BUILDING_SELECT),
         MessageInput(on_unexpected_input, content_types=ContentType.ANY),
         Select(
             id="building_select",
@@ -52,7 +55,7 @@ def building_selection_window() -> Window:
 
 def category_selection_window() -> Window:
     return Window(
-        Const("🏷 Выберите категорию:"),
+        Const(tech_request_btn.CATEGORY_SELECT),
         MessageInput(on_unexpected_input, content_types=ContentType.ANY),
         Select(
             id="category_select",
@@ -68,7 +71,7 @@ def category_selection_window() -> Window:
 
 def title_input_window() -> Window:
     return Window(
-        Const("✍️ Введите заголовок заявки:"),
+        Const(tech_request_msg.TITLE_INPUT),
         MessageInput(on_title_input, content_types=ContentType.TEXT),
         state=CreateTechRequestState.title,
     )
@@ -76,7 +79,7 @@ def title_input_window() -> Window:
 
 def description_input_window() -> Window:
     return Window(
-        Const("📝 Введите описание проблемы:"),
+        Const(tech_request_msg.DESCRIPTION_INPUT),
         MessageInput(on_description_input, content_types=ContentType.TEXT),
         state=CreateTechRequestState.description,
     )
@@ -84,7 +87,7 @@ def description_input_window() -> Window:
 
 def photo_input_window() -> Window:
     return Window(
-        Const("📸 Отправьте фотографию:"),
+        Const(tech_request_msg.PHOTO_INPUT),
         MessageInput(on_photo_input, content_types=ContentType.ANY),
         state=CreateTechRequestState.photo,
     )
@@ -93,18 +96,15 @@ def photo_input_window() -> Window:
 def request_preview_window() -> Window:
     return Window(
         MessageInput(on_unexpected_input, content_types=ContentType.ANY),
-        Format(
-            "🧾 Предпросмотр заявки:\n\n"
-            "🏢 Здание: {building}\n"
-            "🏷 Категория: {category}\n"
-            "📌 Заголовок: {title}\n"
-            "📝 Описание: {description}\n"
-            "📎 Фото: {file_status}"
-        ),
+        Format(tech_request_msg.CREATE_PREVIEW),
         Row(
-            Button(Const("✅ Создать"), id="create", on_click=on_create_tech_request),
             Button(
-                Const("❌ Отмена"), id="cancel", on_click=on_cancel_create_tech_request
+                Const(common_btn.CREATE), id="create", on_click=on_create_tech_request
+            ),
+            Button(
+                Const(common_btn.CANCEL),
+                id="cancel",
+                on_click=on_cancel_create_tech_request,
             ),
         ),
         state=CreateTechRequestState.confirm,
@@ -115,7 +115,7 @@ def request_preview_window() -> Window:
 def tech_request_list_window() -> Window:
     return Window(
         Format("{text}"),
-        Button(Const("🏢 Фонтан"), id="fountain_title"),
+        Button(Const(tech_request_btn.FOUNTAIN), id="fountain_title"),
         Group(
             Select(
                 id="fountain_select",
@@ -127,7 +127,7 @@ def tech_request_list_window() -> Window:
             width=1,
             id="fountain_group",
         ),
-        Button(Const("🏢 Форт Диалог"), id="fort_dialog_title"),
+        Button(Const(tech_request_btn.FORT_DIALOG), id="fort_dialog_title"),
         Group(
             Select(
                 id="fort_dialog_select",
@@ -148,20 +148,14 @@ def tech_request_view_window() -> Window:
     return Window(
         MessageInput(on_unexpected_input, content_types=ContentType.ANY),
         DynamicMedia("photo"),
-        Format(
-            "<b>📝 Заявка</b>\n\n"
-            "📌 <b>{title}</b>\n"
-            "🏢 Здание: {building}\n"
-            "🏷 Категория: {category}\n"
-            "🗒 Описание:\n{description}"
-        ),
+        Format(tech_request_msg.UPDATE_PREVIEW),
         Button(
-            Const("🔙 Назад"),
+            Const(common_btn.BACK),
             id="back",
             on_click=on_cancel_view_clicked,
         ),
         Button(
-            Const("✅ Выполнить"),
+            Const(tech_request_btn.COMPLETE),
             id="mark_done",
             on_click=on_mark_as_done_clicked,
         ),

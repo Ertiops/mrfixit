@@ -22,7 +22,7 @@ class TechRequestStatus(StrEnum):
 
 @unique
 class TechRequestBuilding(StrEnum):
-    FONTAN = "fontan"
+    FOUNTAIN = "fontan"
     FORT_DIALOG = "fort_dialog"
 
 
