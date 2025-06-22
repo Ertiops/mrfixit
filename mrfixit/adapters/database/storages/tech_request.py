@@ -56,7 +56,7 @@ class TechRequestStorage(ITechRequestStorage):
             .where(TechRequestTable.deleted_at.is_(None))
             .order_by(
                 case(
-                    (TechRequestTable.building == TechRequestBuilding.FONTAN, 0),
+                    (TechRequestTable.building == TechRequestBuilding.FOUNTAIN, 0),
                     (TechRequestTable.building == TechRequestBuilding.FORT_DIALOG, 1),
                 ),
                 case(

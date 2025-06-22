@@ -12,6 +12,7 @@ from mrfixit.domains.entities.tech_request import (
 )
 from mrfixit.domains.services.tech_request import TechRequestService
 from mrfixit.domains.uow import AbstractUow
+from mrfixit.presenters.bot.content.messages import tech_request as tech_request_msg
 from mrfixit.presenters.bot.dialogs.states import (
     CreateTechRequestState,
     TechRequestListState,
@@ -81,7 +82,7 @@ async def on_create_tech_request(
                 file_id=manager.dialog_data["file_id"],
             )
         )
-    result_msg = await callback.message.answer("✅ Заявка успешно создана.")  # type: ignore[union-attr]
+    result_msg = await callback.message.answer(tech_request_msg.CREATED)  # type: ignore[union-attr]
     delete_later(result_msg)
     await manager.done(
         show_mode=ShowMode.DELETE_AND_SEND,
@@ -91,7 +92,7 @@ async def on_create_tech_request(
 async def on_cancel_create_tech_request(
     callback: CallbackQuery, button: Button, manager: DialogManager
 ) -> None:
-    result_msg = await callback.message.answer("❌ Создание заявки отменено.")  # type: ignore[union-attr]
+    result_msg = await callback.message.answer(tech_request_msg.NOT_CREATED)  # type: ignore[union-attr]
     delete_later(result_msg)
     await manager.start(
         state=TechRequestListState.view,
@@ -121,9 +122,7 @@ async def on_mark_as_done_clicked(
         "request_id"
     )
     if not request_id:
-        await callback.answer("ID заявки не найден", show_alert=True)
         return
-
     container = manager.middleware_data["dishka_container"]
     service: TechRequestService = await container.get(TechRequestService)
     uow: AbstractUow = await container.get(AbstractUow)
