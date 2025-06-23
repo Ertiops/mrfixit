@@ -1,0 +1,37 @@
+@startuml db
+!define table(x) class x << (T,#FFAAAA) >>
+hide methods
+hide stereotypes
+
+table(tech_requests) {
+  +id : UUID [PK]
+  --
+  title : varchar(63)
+  description : varchar(512)
+  category : tech_request_category [enum]
+  status : tech_request_status [enum]
+  building : tech_request_building [enum]
+  file_id : varchar(512)
+  --
+  created_at : timestamp
+  updated_at : timestamp
+}
+
+
+enum tech_request_category {
+  ordinary
+  urgent
+}
+
+enum tech_request_status {
+  created
+  done
+}
+
+enum tech_request_building {
+  fontan
+  fort_dialog
+}
+
+
+@enduml
