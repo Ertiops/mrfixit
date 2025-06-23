@@ -12,5 +12,22 @@ services:
       - "8000:8000"
     restart: unless-stopped
 
+  db:
+    image: postgres:16
+    restart: unless-stopped
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_USER=mrfixit
+      - POSTGRES_PASSWORD=mrfixit
+      - POSTGRES_DB=mrfixit
+
   redis:
-      image: redis:latest
+    image: redis:latest
+    container_name: mrfixit_redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    command: /bin/sh -c "redis-server --requirepass $$APP_REDIS_PASSWORD"
+    env_file:
+      - .env
