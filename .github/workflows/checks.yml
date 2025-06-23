@@ -71,7 +71,7 @@ jobs:
         run: make develop
 
       - name: Build Redis image with password
-        run: docker build -t redis-auth -f .github/redis.Dockerfile .
+        run: docker build -t redis-auth -f .github/redis/Dockerfile .
 
       - name: Run Redis container
         run: |
