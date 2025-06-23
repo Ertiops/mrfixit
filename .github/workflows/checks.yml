@@ -42,14 +42,12 @@ jobs:
           POSTGRES_DB: mrfixit
 
     env:
-      # PostgreSQL
       APP_DB_USER: mrfixit
       APP_DB_PASSWORD: mrfixit
       APP_DB_NAME: mrfixit
       APP_DB_HOST: localhost
       APP_DB_PORT: 5432
 
-      # Redis
       APP_REDIS_PASSWORD: mrfixit
       APP_REDIS_HOST: localhost
       APP_REDIS_PORT: 6379
