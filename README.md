@@ -134,15 +134,6 @@ tests/          # Unit tests, test utils, factories
 Makefile        # Development scripts
 ...
 ```
-
----
-
-## 📌 TODO
-
-* [ ] Add CI/CD (GitHub Actions)
-* [ ] Add DB schema diagram to `docs/`
-* [ ] Public bot demo and screenshots
-
 ---
 
 ## 🧑‍💻 Author
