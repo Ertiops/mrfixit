@@ -8,9 +8,19 @@ from alembic.config import CommandLine
 from mrfixit.adapters.database.utils import make_alembic_config
 
 
-@dataclass(kw_only=True, slots=True, frozen=True)
+@dataclass(frozen=True, kw_only=True, slots=True)
 class DatabaseConfig:
-    master_dsn: str = field(default_factory=lambda: environ["APP_DB_DSN"])
+    user: str = field(default_factory=lambda: environ.get("APP_DB_USER", "mrfixit"))
+    password: str = field(
+        default_factory=lambda: environ.get("APP_DB_PASSWORD", "mrfixit")
+    )
+    name: str = field(default_factory=lambda: environ.get("APP_DB_NAME", "mrfixit"))
+    host: str = field(default_factory=lambda: environ.get("APP_DB_HOST", "127.0.0.1"))
+    port: int = field(default_factory=lambda: int(environ.get("APP_DB_PORT", 5432)))
+
+    @property
+    def dsn(self) -> str:
+        return f"postgresql+asyncpg://{self.user}:{self.password}@{self.host}:{self.port}/{self.name}"
 
 
 def main() -> None:
@@ -23,7 +33,7 @@ def main() -> None:
         alembic.parser.error("Too few arguments")
         exit(128)
     else:
-        config = make_alembic_config(options, pg_url=db_config.master_dsn)
+        config = make_alembic_config(options, pg_url=db_config.dsn)
         alembic.run_cmd(config, options)
         exit()
 
