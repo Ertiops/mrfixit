@@ -116,7 +116,6 @@ Example `.env.dev`:
 * Redis
 * aiomisc (scheduling, cron jobs)
 * Dishka (DI container)
-* Pydantic v2
 * Poetry + Make
 * Docker / Docker Compose
 
