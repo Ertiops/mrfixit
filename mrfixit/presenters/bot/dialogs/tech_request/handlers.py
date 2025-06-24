@@ -29,7 +29,7 @@ async def on_title_input(
     await message.delete()
     await manager.switch_to(
         state=CreateTechRequestState.description,
-        show_mode=ShowMode.SEND,
+        show_mode=ShowMode.DELETE_AND_SEND,
     )
 
 
@@ -44,7 +44,7 @@ async def on_description_input(
     await message.delete()
     await manager.switch_to(
         state=CreateTechRequestState.photo,
-        show_mode=ShowMode.SEND,
+        show_mode=ShowMode.DELETE_AND_SEND,
     )
 
 
@@ -61,7 +61,7 @@ async def on_photo_input(
     await message.delete()
     await manager.switch_to(
         state=CreateTechRequestState.confirm,
-        show_mode=ShowMode.SEND,
+        show_mode=ShowMode.DELETE_AND_SEND,
     )
 
 
@@ -84,7 +84,8 @@ async def on_create_tech_request(
         )
     result_msg = await callback.message.answer(tech_request_msg.CREATED)  # type: ignore[union-attr]
     delete_later(result_msg)
-    await manager.done(
+    await manager.start(
+        state=TechRequestListState.view,
         show_mode=ShowMode.DELETE_AND_SEND,
     )
 
@@ -97,7 +98,7 @@ async def on_cancel_create_tech_request(
     await manager.start(
         state=TechRequestListState.view,
         mode=StartMode.RESET_STACK,
-        show_mode=ShowMode.SEND,
+        show_mode=ShowMode.DELETE_AND_SEND,
     )
 
 
@@ -109,7 +110,7 @@ async def on_cancel_view_clicked(
     await manager.start(
         state=TechRequestListState.view,
         mode=StartMode.RESET_STACK,
-        show_mode=ShowMode.SEND,
+        show_mode=ShowMode.DELETE_AND_SEND,
     )
 
 
@@ -134,5 +135,5 @@ async def on_mark_as_done_clicked(
     await manager.start(
         state=TechRequestListState.view,
         mode=StartMode.RESET_STACK,
-        show_mode=ShowMode.SEND,
+        show_mode=ShowMode.DELETE_AND_SEND,
     )
