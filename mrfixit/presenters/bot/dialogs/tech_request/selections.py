@@ -63,6 +63,6 @@ async def on_tech_request_clicked(
     await manager.start(
         state=GetTechRequestState.view,
         mode=StartMode.RESET_STACK,
-        show_mode=ShowMode.SEND,
+        show_mode=ShowMode.DELETE_AND_SEND,
         data={"request_id": item_id},
     )
