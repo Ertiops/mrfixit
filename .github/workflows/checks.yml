@@ -92,23 +92,37 @@ jobs:
             junit.xml
 
   build:
-      name: Build Docker image
-      runs-on: ubuntu-latest
+    name: Build Docker image
+    runs-on: ubuntu-latest
+    environment: mrfixit
+    steps:
+      - uses: actions/checkout@v4
 
-      steps:
-        - uses: actions/checkout@v4
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
 
-        - name: Set up Docker Buildx
-          uses: docker/setup-buildx-action@v3
+      - name: Cache Docker layers
+        uses: actions/cache@v4
+        with:
+          path: /tmp/.buildx-cache
+          key: ${{ runner.os }}-buildx-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-buildx-
 
-        - name: Cache Docker layers
-          uses: actions/cache@v4
-          with:
-            path: /tmp/.buildx-cache
-            key: ${{ runner.os }}-buildx-${{ github.sha }}
-            restore-keys: |
-              ${{ runner.os }}-buildx-
-
-        - name: Build Docker image
-          run: |
-            docker build -t mrfixit .
+      - name: Build Docker image
+        run: |
+          docker build \
+            --build-arg APP_DB_USER=${{ secrets.APP_DB_USER }} \
+            --build-arg APP_DB_PASSWORD=${{ secrets.APP_DB_PASSWORD }} \
+            --build-arg APP_DB_NAME=${{ secrets.APP_DB_NAME }} \
+            --build-arg APP_DB_HOST=${{ secrets.APP_DB_HOST }} \
+            --build-arg APP_DB_PORT=${{ secrets.APP_DB_PORT }} \
+            --build-arg APP_DB_POOL_SIZE=${{ secrets.APP_DB_POOL_SIZE }} \
+            --build-arg APP_DB_POOL_TIMEOUT=${{ secrets.APP_DB_POOL_TIMEOUT }} \
+            --build-arg APP_DB_DEBUG=${{ secrets.APP_DB_DEBUG }} \
+            --build-arg APP_REDIS_PASSWORD=${{ secrets.APP_REDIS_PASSWORD }} \
+            --build-arg APP_REDIS_HOST=${{ secrets.APP_REDIS_HOST }} \
+            --build-arg APP_REDIS_PORT=${{ secrets.APP_REDIS_PORT }} \
+            --build-arg APP_TG_BOT_TOKEN=${{ secrets.APP_TG_BOT_TOKEN }} \
+            --build-arg APP_TG_ALLOWED_CHAT_ID=${{ secrets.APP_TG_ALLOWED_CHAT_ID }} \
+            -t mrfixit .
