@@ -135,31 +135,26 @@ jobs:
     if: github.event_name == 'pull_request' && github.actor == 'Ertiops'
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout Code
+        uses: actions/checkout@v2
 
-      - name: Deploy code and restart services
-        uses: easingthemes/ssh-deploy@main
+      - name: Deploy to VPS
+        uses: appleboy/ssh-action@master
         with:
-          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
-          REMOTE_HOST: ${{ secrets.REMOTE_HOST }}
-          REMOTE_USER: ${{ secrets.REMOTE_USER }}
-          TARGET: ${{ secrets.REMOTE_TARGET }}
-          SOURCE: |
-            docker-compose.yml
-            Dockerfile
-            .env
-            pyproject.toml
-            poetry.lock
-            mrfixit/
-          EXCLUDE: ".git/, __pycache__/, *.pyc"
-          ARGS: "-rlgoDzvc -i --delete"
-          SCRIPT_BEFORE: |
-            echo "[BEFORE] stop containers"
+          host: ${{ secrets.VPS_HOST }}
+          username: root
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: 22
+          script: |
+            set -e
+
+            echo "📁 Переход в директорию проекта"
             cd /root/projects/mrfixit
-            docker compose down || true
-          SCRIPT_AFTER: |
-            echo "[AFTER] rebuild and run"
-            cd /root/projects/mrfixit
-            docker compose pull
-            docker compose up -d --build
+
+            echo "📦 Обновление кода с GitHub"
+            git pull https://github.com/Ertiops/mrfixit.git main
+
+            echo "🐳 Перезапуск Docker Compose"
+            docker compose down
+            docker compose up --build -d
 
