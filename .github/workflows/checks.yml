@@ -131,7 +131,7 @@ jobs:
       name: Deploy to VPS
       runs-on: ubuntu-latest
       # needs: [build]
-      environment: mrfixit
+      environment: deploy
       if: github.event_name == 'pull_request' && github.actor == 'Ertiops'
 
       steps:
