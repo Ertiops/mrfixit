@@ -141,20 +141,18 @@ jobs:
       - name: Deploy to VPS
         uses: appleboy/ssh-action@master
         with:
-          host: ${{ secrets.VPS_HOST }}
-          username: root
+          host: ${{ secrets.REMOTE_HOST }}
+          username: ${{ secrets.REMOTE_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           port: 22
           script: |
             set -e
 
             echo "📁 Переход в директорию проекта"
-            cd /root/projects/mrfixit
+            cd ${{ secrets.REMOTE_TARGET }}
 
             echo "📦 Обновление кода с GitHub"
-            git pull https://github.com/Ertiops/mrfixit.git main
-
+            git pull
             echo "🐳 Перезапуск Docker Compose"
             docker compose down
             docker compose up --build -d
-
