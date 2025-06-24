@@ -140,7 +140,10 @@ jobs:
 
         - name: Deploy over SSH
           run: |
-            sshpass -p "${{ secrets.VPS_PASSWORD }}" ssh -o StrictHostKeyChecking=no ${{ secrets.VPS_USERNAME }}@${{ secrets.VPS_HOST }} << 'EOF'
+            sshpass -p "${{ secrets.VPS_PASSWORD }}" ssh -tt \
+              -o PubkeyAuthentication=no \
+              -o StrictHostKeyChecking=no \
+              ${{ secrets.VPS_USERNAME }}@${{ secrets.VPS_HOST }} << 'EOF'
               set -e
               cd /root/projects/mrfixit
               git pull origin main
