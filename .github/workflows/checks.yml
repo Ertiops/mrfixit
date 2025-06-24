@@ -142,7 +142,7 @@ jobs:
           run: |
             sshpass -p "${{ secrets.VPS_PASSWORD }}" ssh -o StrictHostKeyChecking=no ${{ secrets.VPS_USERNAME }}@${{ secrets.VPS_HOST }} << 'EOF'
               set -e
-              cd ~/path/to/your/project  # 👉 укажи правильный путь
+              cd /root/projects/mrfixit
               git pull origin main
               docker compose pull
               docker compose up -d --build
