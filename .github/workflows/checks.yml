@@ -138,6 +138,18 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v2
 
+      - name: 🔍 Debug SSH key format
+        run: |
+          echo "🔐 BEGIN:"
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" | head -n 2
+
+          echo "🔐 END:"
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" | tail -n 2
+
+          echo "🔢 Total lines:"
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" | wc -l
+
+
       - name: Deploy to VPS
         uses: appleboy/ssh-action@master
         with:
