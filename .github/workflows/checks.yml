@@ -150,6 +150,13 @@ jobs:
           echo "${{ secrets.SSH_PRIVATE_KEY }}" | wc -l
 
 
+      - name: Setup SSH key
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_PRIVATE_KEY_B64 }}" | base64 -d > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+          ssh-keyscan -H ${{ secrets.REMOTE_HOST }} >> ~/.ssh/known_hosts
+
       - name: Deploy to VPS
         uses: appleboy/ssh-action@master
         with:
