@@ -135,7 +135,7 @@ jobs:
 
     steps:
       - name: Checkout Code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
       - name: 🛠 Write SSH key to file
         run: |
@@ -153,13 +153,8 @@ jobs:
           port: 22
           script: |
             set -e
-            echo "📁 Переход в директорию проекта"
-            cd /home/github/projects/mrfixit
-
-            echo "📦 Обновление кода с GitHub"
+            cd ${{ secrets.REMOTE_TARGET }}
             git pull
-
-            echo "🐳 Перезапуск Docker Compose"
             docker compose down
             docker compose up --build -d
 
