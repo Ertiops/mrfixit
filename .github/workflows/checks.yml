@@ -155,14 +155,15 @@ jobs:
           echo "🔑 Known hosts:"
           cat ~/.ssh/known_hosts || echo "❌ known_hosts missing"
 
-      - name: 🧠 Add SSH key to agent
+      - name: 🚀 Deploy via SSH
         run: |
           eval "$(ssh-agent -s)"
           ssh-add ~/.ssh/id_mrfixit_ci
 
-      - name: 🚀 Deploy via SSH
-        run: |
-          ssh -v -o StrictHostKeyChecking=no root@${{ secrets.REMOTE_HOST }} << 'EOF'
+          ssh -i ~/.ssh/id_mrfixit_ci \
+              -o StrictHostKeyChecking=no \
+              -v \
+              root@${{ secrets.REMOTE_HOST }} << 'EOF'
             set -e
             cd /projects/mrfixit
             echo "📦 Pulling latest code"
