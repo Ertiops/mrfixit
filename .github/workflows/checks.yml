@@ -137,24 +137,23 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v2
 
-      - name: 🔍 Debug SSH Key
+      - name: Write SSH key to file
         run: |
-          echo "🔐 BEGIN"
-          echo "${{ secrets.SSH_PRIVATE_KEY }}" | head -n 2
-          echo "${{ secrets.SSH_PRIVATE_KEY }}" | tail -n 2
-          echo "🔢 Total lines:"
-          echo "${{ secrets.SSH_PRIVATE_KEY }}" | wc -l
-          echo "🔐 END"
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_mrfixit_ci
+          chmod 600 ~/.ssh/id_mrfixit_ci
+          ssh-keyscan -H ${{ secrets.REMOTE_HOST }} >> ~/.ssh/known_hosts
 
       - name: Deploy to VPS
         uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.REMOTE_HOST }}
           username: ${{ secrets.REMOTE_USER }}
-          key: ${{ secrets.SSH_PRIVATE_KEY }}  # ❗ без base64
+          key_path: ~/.ssh/id_mrfixit_ci
           port: 22
           script: |
             cd ${{ secrets.REMOTE_TARGET }}
             git pull
             docker compose down
             docker compose up --build -d
+
