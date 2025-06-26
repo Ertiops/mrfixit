@@ -155,7 +155,7 @@ jobs:
         with:
           host: ${{ secrets.REMOTE_HOST }}
           username: ${{ secrets.REMOTE_USER }}
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          key_path: ~/.ssh/id_mrfixit_ci  # <-- используем путь к файлу
           port: 22
           script: |
             set -e
@@ -168,5 +168,6 @@ jobs:
             echo "🐳 Перезапуск Docker Compose"
             docker compose down
             docker compose up --build -d
+
 
 
