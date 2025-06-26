@@ -138,31 +138,18 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v2
 
-      - name: 🔍 Debug SSH key format
+      - name: Debug decoded private key exists
         run: |
-          echo "🔐 BEGIN:"
-          echo "${{ secrets.SSH_PRIVATE_KEY }}" | head -n 2
+          echo "🔐 BEGIN"
+          [ -f ~/.ssh/id_ed25519 ] && echo "✅ SSH key exists" || echo "❌ SSH key missing"
+          echo "🔐 END"
 
-          echo "🔐 END:"
-          echo "${{ secrets.SSH_PRIVATE_KEY }}" | tail -n 2
-
-          echo "🔢 Total lines:"
-          echo "${{ secrets.SSH_PRIVATE_KEY }}" | wc -l
-
-      - name: Setup SSH key
-        run: |
-          mkdir -p ~/.ssh
-          echo "${{ secrets.SSH_PRIVATE_KEY }}" | base64 -d > ~/.ssh/id_rsa
-          chmod 600 ~/.ssh/id_rsa
-          ssh-keyscan -H ${{ secrets.REMOTE_HOST }} >> ~/.ssh/known_hosts
-
-
-      - name: Deploy to VPS
+      - name: Deploy to VPS via SSH
         uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.REMOTE_HOST }}
           username: ${{ secrets.REMOTE_USER }}
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          key: ${{ secrets.SSH_PRIVATE_KEY_B64 }}
           port: 22
           script: |
             set -e
@@ -172,6 +159,7 @@ jobs:
 
             echo "📦 Обновление кода с GitHub"
             git pull
+
             echo "🐳 Перезапуск Docker Compose"
             docker compose down
             docker compose up --build -d
