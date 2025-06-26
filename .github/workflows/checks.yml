@@ -155,9 +155,9 @@ jobs:
         run: |
           ssh -v -i ~/.ssh/id_mrfixit_ci \
               -o StrictHostKeyChecking=no \
-              github@9aa6f0c70425.vps.myjino.ru << 'EOF'
+              root@9aa6f0c70425.vps.myjino.ru << 'EOF'
             set -e
-            cd /home/github/projects/mrfixit
+            cd /projects/mrfixit
             echo "📦 Pulling latest code"
             git pull
             echo "🐳 Restarting Docker Compose"
