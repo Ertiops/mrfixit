@@ -137,30 +137,25 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v2
 
-      - name: 🛠 Write SSH key to file
+      - name: 🛠 Write SSH key to file and add to agent
         run: |
           mkdir -p ~/.ssh
-          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_mrfixit_ci
-          chmod 600 ~/.ssh/id_mrfixit_ci
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
           ssh-keyscan -H ${{ secrets.REMOTE_HOST }} >> ~/.ssh/known_hosts
-
-      - name: ➕ Add SSH key to ssh-agent
-        run: |
           eval "$(ssh-agent -s)"
-          ssh-add ~/.ssh/id_mrfixit_ci
+          ssh-add ~/.ssh/id_ed25519
 
       - name: 🔍 Debug SSH key
         run: |
           echo "📄 Private key preview:"
-          head -n 5 ~/.ssh/id_mrfixit_ci || echo "❌ Key missing"
+          head -n 5 ~/.ssh/id_ed25519 || echo "❌ Key missing"
           ls -la ~/.ssh
           cat ~/.ssh/known_hosts || echo "❌ known_hosts missing"
 
-      - name: 🚀 Deploy via SSH
+      - name: 🚀 Deploy via SSH (agent)
         run: |
-          ssh -v \
-              -o StrictHostKeyChecking=no \
-              -i ~/.ssh/id_mrfixit_ci \
+          ssh -o StrictHostKeyChecking=no \
               root@${{ secrets.REMOTE_HOST }} << 'EOF'
             set -e
             cd /projects/mrfixit
