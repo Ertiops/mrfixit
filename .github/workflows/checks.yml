@@ -97,7 +97,7 @@ jobs:
     name: Build Docker image
     runs-on: ubuntu-latest
     environment: mrfixit
-    if: github.event_name == 'pull_request' && github.ref == 'refs/heads/main'
+    if: github.event_name == 'pull_request'
     steps:
       - uses: actions/checkout@v4
 
