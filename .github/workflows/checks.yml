@@ -140,13 +140,13 @@ jobs:
       - name: 🛠 Write SSH key to file
         run: |
           mkdir -p ~/.ssh
-          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
-          chmod 600 ~/.ssh/id_rsa
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_mrfixit_ci
+          chmod 600 ~/.ssh/id_mrfixit_ci
           ssh-keyscan -H ${{ secrets.REMOTE_HOST }} >> ~/.ssh/known_hosts
 
-      - name: 🚀 Deploy using OpenSSH client
+      - name: 🚀 Deploy via SSH
         run: |
-          ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa ${{ secrets.REMOTE_USER }}@${{ secrets.REMOTE_HOST }} << 'EOF'
+          ssh -i ~/.ssh/id_mrfixit_ci -o StrictHostKeyChecking=no ${{ secrets.REMOTE_USER }}@${{ secrets.REMOTE_HOST }} << 'EOF'
             set -e
             cd ${{ secrets.REMOTE_TARGET }}
             echo "📦 Pulling latest code"
