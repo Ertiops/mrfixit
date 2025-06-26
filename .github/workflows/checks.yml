@@ -130,6 +130,7 @@ jobs:
   docker-build-and-push:
     name: 🐳 Build and Push to DockerHub
     runs-on: ubuntu-latest
+    environment: deploy
 
     steps:
       - name: 📥 Checkout code
