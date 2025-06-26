@@ -137,28 +137,21 @@ jobs:
       - name: 📥 Checkout Code
         uses: actions/checkout@v2
 
-      - name: 🔐 Write SSH key and config
+      - name: 🛠 Write SSH key to file
         run: |
           mkdir -p ~/.ssh
           echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_mrfixit_ci
           chmod 600 ~/.ssh/id_mrfixit_ci
+          ssh-keyscan -H ${{ secrets.REMOTE_HOST }} >> ~/.ssh/known_hosts
 
-          # ~/.ssh/config
-          cat <<EOF > ~/.ssh/config
-          Host mrfixit
-              HostName 9aa6f0c70425.vps.myjino.ru
-              User root
-              IdentityFile ~/.ssh/id_mrfixit_ci
-              IdentitiesOnly yes
-          EOF
-          chmod 600 ~/.ssh/config
-
-          # Known hosts
-          ssh-keyscan -H 9aa6f0c70425.vps.myjino.ru >> ~/.ssh/known_hosts
-
-      - name: 🚀 Deploy
+      - name: 🧠 Add SSH key to agent
         run: |
-          ssh mrfixit << 'EOF'
+          eval "$(ssh-agent -s)"
+          ssh-add ~/.ssh/id_mrfixit_ci
+
+      - name: 🚀 Deploy via SSH
+        run: |
+          ssh -o StrictHostKeyChecking=no root@${{ secrets.REMOTE_HOST }} << 'EOF'
             set -e
             cd /projects/mrfixit
             echo "📦 Pulling latest code"
