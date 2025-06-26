@@ -144,12 +144,18 @@ jobs:
           chmod 600 ~/.ssh/id_mrfixit_ci
           ssh-keyscan -H ${{ secrets.REMOTE_HOST }} >> ~/.ssh/known_hosts
 
+      - name: 🔍 Debug SSH key presence
+        run: |
+          echo "🔐 BEGIN SSH KEY PREVIEW"
+          head -n 2 /home/runner/.ssh/id_mrfixit_ci || echo "❌ key missing"
+          echo "🔐 END"
+
       - name: 🚀 Deploy to VPS
         uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.REMOTE_HOST }}
           username: ${{ secrets.REMOTE_USER }}
-          key_path: ~/.ssh/id_mrfixit_ci
+          key_path: /home/runner/.ssh/id_mrfixit_ci
           port: 22
           script: |
             set -e
@@ -160,4 +166,3 @@ jobs:
             echo "🐳 Перезапуск Docker Compose"
             docker compose down
             docker compose up --build -d
-
