@@ -134,27 +134,21 @@ jobs:
     if: github.event_name == 'pull_request' && github.actor == 'Ertiops'
 
     steps:
-      - name: Checkout Code
+      - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: 🛠 Write SSH key to file
+      - name: Set up SSH key
         run: |
           mkdir -p ~/.ssh
-          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_mrfixit_ci
-          chmod 600 ~/.ssh/id_mrfixit_ci
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
           ssh-keyscan -H ${{ secrets.REMOTE_HOST }} >> ~/.ssh/known_hosts
 
-      - name: 🚀 Deploy to VPS
-        uses: appleboy/ssh-action@master
-        with:
-          host: ${{ secrets.REMOTE_HOST }}
-          username: github
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
-          port: 22
-          script: |
-            set -e
-            cd ${{ secrets.REMOTE_TARGET }}
+      - name: Manual SSH deployment
+        run: |
+          ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no github@${{ secrets.REMOTE_HOST }} << 'EOF'
+            cd ~/projects/mrfixit
             git pull
             docker compose down
             docker compose up --build -d
-
+          EOF
