@@ -140,22 +140,25 @@ jobs:
       - name: 🛠 Write SSH key to file
         run: |
           mkdir -p ~/.ssh
-          echo -e "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_mrfixit_ci
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_mrfixit_ci
           chmod 600 ~/.ssh/id_mrfixit_ci
           ssh-keyscan -H ${{ secrets.REMOTE_HOST }} >> ~/.ssh/known_hosts
 
-      - name: 🔍 Debug SSH key presence
+      - name: 🐞 Debug SSH Key
         run: |
-          echo "🔐 BEGIN SSH KEY PREVIEW"
-          head -n 2 /home/runner/.ssh/id_mrfixit_ci || echo "❌ key missing"
-          echo "🔐 END"
+          echo "🔐 HEADER:"
+          head -n 2 ~/.ssh/id_mrfixit_ci
+          echo "🔐 FOOTER:"
+          tail -n 2 ~/.ssh/id_mrfixit_ci
+          echo "🔢 Total lines:"
+          wc -l ~/.ssh/id_mrfixit_ci
 
       - name: 🚀 Deploy to VPS
         uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.REMOTE_HOST }}
           username: ${{ secrets.REMOTE_USER }}
-          key_path: /home/runner/.ssh/id_mrfixit_ci
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
           port: 22
           script: |
             set -e
