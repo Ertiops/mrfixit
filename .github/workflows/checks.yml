@@ -157,6 +157,13 @@ jobs:
           chmod 600 ~/.ssh/id_ed25519
           ssh-keyscan -H ${{ secrets.REMOTE_HOST }} >> ~/.ssh/known_hosts
 
+      - name: Debug SSH Key
+        run: |
+          echo "🔐 BEGIN:"
+          cat ~/.ssh/id_ed25519 || echo "❌ Не найден файл приватного ключа"
+          echo "🔐 END"
+
+
       - name: Deploy to VPS
         uses: appleboy/ssh-action@master
         with:
