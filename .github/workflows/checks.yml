@@ -128,27 +128,42 @@ jobs:
   #           -t mrfixit .
 
   deploy:
-    name: Deploy to VPS
+    name: 🚀 Deploy to VPS
     runs-on: ubuntu-latest
     environment: deploy
-
     if: github.event_name == 'pull_request' && github.actor == 'Ertiops'
 
     steps:
-      - name: 📦 Checkout repository
+      - name: 📥 Checkout Code
         uses: actions/checkout@v2
 
-      - name: 🚀 Deploy via SSH password
-        uses: appleboy/ssh-action@master
-        with:
-          host: ${{ secrets.REMOTE_HOST }}
-          username: ${{ secrets.REMOTE_USER }}
-          password: ${{ secrets.REMOTE_PASSWORD }}
-          port: 22
-          script: |
+      - name: 🔐 Write SSH key and config
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_mrfixit_ci
+          chmod 600 ~/.ssh/id_mrfixit_ci
+
+          # ~/.ssh/config
+          cat <<EOF > ~/.ssh/config
+          Host mrfixit
+              HostName 9aa6f0c70425.vps.myjino.ru
+              User root
+              IdentityFile ~/.ssh/id_mrfixit_ci
+              IdentitiesOnly yes
+          EOF
+          chmod 600 ~/.ssh/config
+
+          # Known hosts
+          ssh-keyscan -H 9aa6f0c70425.vps.myjino.ru >> ~/.ssh/known_hosts
+
+      - name: 🚀 Deploy
+        run: |
+          ssh mrfixit << 'EOF'
+            set -e
             cd /projects/mrfixit
             echo "📦 Pulling latest code"
             git pull
             echo "🐳 Restarting Docker Compose"
             docker compose down
             docker compose up --build -d
+          EOF
