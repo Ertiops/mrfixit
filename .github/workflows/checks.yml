@@ -127,48 +127,26 @@ jobs:
   #           --build-arg APP_TG_ALLOWED_CHAT_ID=${{ secrets.APP_TG_ALLOWED_CHAT_ID }} \
   #           -t mrfixit .
 
-  deploy:
-    name: 🚀 Deploy to VPS
+  docker-build-and-push:
+    name: 🐳 Build and Push to DockerHub
     runs-on: ubuntu-latest
-    environment: deploy
-    if: github.event_name == 'pull_request' && github.actor == 'Ertiops'
 
     steps:
-      - name: 📥 Checkout Code
-        uses: actions/checkout@v2
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
 
-      - name: 🛠 Write SSH key to file
-        run: |
-          mkdir -p ~/.ssh
-          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_mrfixit_ci
-          chmod 600 ~/.ssh/id_mrfixit_ci
-          ssh-keyscan -H ${{ secrets.REMOTE_HOST }} >> ~/.ssh/known_hosts
+      - name: 🔐 Login to DockerHub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: 🔍 Inspect SSH key
-        run: |
-          echo "📄 Key preview (first 5 lines):"
-          head -n 5 ~/.ssh/id_mrfixit_ci || echo "❌ Key missing"
-          echo "📏 Key size (bytes):"
-          wc -c ~/.ssh/id_mrfixit_ci || echo "❌ File not found"
-          echo "🔐 Permissions:"
-          ls -l ~/.ssh/id_mrfixit_ci
-          echo "🔑 Known hosts:"
-          cat ~/.ssh/known_hosts || echo "❌ known_hosts missing"
+      - name: 🛠 Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
 
-      - name: 🚀 Deploy via SSH
-        run: |
-          eval "$(ssh-agent -s)"
-          ssh-add ~/.ssh/id_mrfixit_ci
-
-          ssh -i ~/.ssh/id_mrfixit_ci \
-              -o StrictHostKeyChecking=no \
-              -v \
-              root@${{ secrets.REMOTE_HOST }} << 'EOF'
-            set -e
-            cd /projects/mrfixit
-            echo "📦 Pulling latest code"
-            git pull
-            echo "🐳 Restarting Docker Compose"
-            docker compose down
-            docker compose up --build -d
-          EOF
+      - name: 🧱 Build and Push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true
+          tags: ertiops/mrfixit:pr-${{ github.event.pull_request.number }}
