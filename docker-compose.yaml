@@ -1,14 +1,14 @@
 services:
   mrfixit:
-    build:
-      context: .
-      dockerfile: Dockerfile
+    image: ertiops/mrfixit:latest
     container_name: mrfixit_app
     env_file:
       - .env
     ports:
       - "8001:8000"
     restart: unless-stopped
+    labels:
+      - "com.centurylinklabs.watchtower.enable=true"
 
   db:
     image: postgres:16
@@ -31,6 +31,14 @@ services:
     command: /bin/sh -c "redis-server --requirepass ${APP_REDIS_PASSWORD}"
     env_file:
       - .env
+
+  watchtower:
+    image: containrrr/watchtower
+    container_name: watchtower
+    restart: unless-stopped
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    command: --cleanup --interval 30
 
 volumes:
   postgres_data:
