@@ -144,28 +144,22 @@ jobs:
           chmod 600 ~/.ssh/id_mrfixit_ci
           ssh-keyscan -H ${{ secrets.REMOTE_HOST }} >> ~/.ssh/known_hosts
 
-      - name: 🐞 Debug SSH Key
-        run: |
-          echo "🔐 HEADER:"
-          head -n 2 ~/.ssh/id_mrfixit_ci
-          echo "🔐 FOOTER:"
-          tail -n 2 ~/.ssh/id_mrfixit_ci
-          echo "🔢 Total lines:"
-          wc -l ~/.ssh/id_mrfixit_ci
-
       - name: 🚀 Deploy to VPS
         uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.REMOTE_HOST }}
-          username: ${{ secrets.REMOTE_USER }}
+          username: github
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           port: 22
           script: |
             set -e
             echo "📁 Переход в директорию проекта"
-            cd ${{ secrets.REMOTE_TARGET }}
+            cd /home/github/projects/mrfixit
+
             echo "📦 Обновление кода с GitHub"
             git pull
+
             echo "🐳 Перезапуск Docker Compose"
             docker compose down
             docker compose up --build -d
+
