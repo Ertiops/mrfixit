@@ -130,38 +130,23 @@ jobs:
   deploy:
     name: Deploy to VPS
     runs-on: ubuntu-latest
-    environment: deploy
     if: github.event_name == 'pull_request' && github.actor == 'Ertiops'
 
     steps:
-      - name: Checkout Code
+      - name: 📦 Checkout repository
         uses: actions/checkout@v2
 
-      - name: 🛠 Write SSH key to file and add to agent
-        run: |
-          mkdir -p ~/.ssh
-          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_ed25519
-          chmod 600 ~/.ssh/id_ed25519
-          ssh-keyscan -H ${{ secrets.REMOTE_HOST }} >> ~/.ssh/known_hosts
-          eval "$(ssh-agent -s)"
-          ssh-add ~/.ssh/id_ed25519
-
-      - name: 🔍 Debug SSH key
-        run: |
-          echo "📄 Private key preview:"
-          head -n 5 ~/.ssh/id_ed25519 || echo "❌ Key missing"
-          ls -la ~/.ssh
-          cat ~/.ssh/known_hosts || echo "❌ known_hosts missing"
-
-      - name: 🚀 Deploy via SSH (agent)
-        run: |
-          ssh -o StrictHostKeyChecking=no \
-              root@${{ secrets.REMOTE_HOST }} << 'EOF'
-            set -e
+      - name: 🚀 Deploy via SSH password
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.REMOTE_HOST }}
+          username: ${{ secrets.REMOTE_USER }}
+          password: ${{ secrets.REMOTE_PASSWORD }}
+          port: 22
+          script: |
             cd /projects/mrfixit
             echo "📦 Pulling latest code"
             git pull
             echo "🐳 Restarting Docker Compose"
             docker compose down
             docker compose up --build -d
-          EOF
