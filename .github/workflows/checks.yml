@@ -144,11 +144,20 @@ jobs:
           chmod 600 ~/.ssh/id_mrfixit_ci
           ssh-keyscan -H ${{ secrets.REMOTE_HOST }} >> ~/.ssh/known_hosts
 
+      - name: 🔍 Debug SSH key
+        run: |
+          echo "📄 Private key preview:"
+          head -n 5 ~/.ssh/id_mrfixit_ci || echo "❌ Key missing"
+          ls -la ~/.ssh
+          cat ~/.ssh/known_hosts || echo "❌ known_hosts missing"
+
       - name: 🚀 Deploy via SSH
         run: |
-          ssh -i ~/.ssh/id_mrfixit_ci -o StrictHostKeyChecking=no ${{ secrets.REMOTE_USER }}@${{ secrets.REMOTE_HOST }} << 'EOF'
+          ssh -v -i ~/.ssh/id_mrfixit_ci \
+              -o StrictHostKeyChecking=no \
+              github@9aa6f0c70425.vps.myjino.ru << 'EOF'
             set -e
-            cd ${{ secrets.REMOTE_TARGET }}
+            cd /home/github/projects/mrfixit
             echo "📦 Pulling latest code"
             git pull
             echo "🐳 Restarting Docker Compose"
