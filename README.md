@@ -14,14 +14,15 @@ Designed for staff and technical personnel in environments like escape room proj
 * 🛠️ PostgreSQL for storing tech requests
 * 🧵 Transaction management via Unit of Work pattern
 * ⏰ Scheduled cleanup of processed requests using [aiomisc](https://aiomisc.readthedocs.io/)
-* 🥪 Modular unit testing with [pytest](https://docs.pytest.org/)
+* 🧇 Modular unit testing with [pytest](https://docs.pytest.org/)
 * 🧹 Static analysis with [ruff](https://github.com/astral-sh/ruff) and [mypy](https://github.com/python/mypy)
 * 🐳 Docker & Makefile for local development and production
-* 🥷 Integrated [pre-commit](https://pre-commit.com/) hooks
+* 🦷 Integrated [pre-commit](https://pre-commit.com/) hooks
+* 🚀 CI/CD via GitHub Actions and DockerHub with auto-deploy on VPS using Watchtower
 
 ---
 
-## 🚀 Functional Overview
+## Ὠ0 Functional Overview
 
 **User roles**: Staff members and technical team.
 **Core capabilities**:
@@ -37,21 +38,17 @@ Designed for staff and technical personnel in environments like escape room proj
 
 ### 📅 Install Dependencies
 
-Use `make develop` to create a virtual environment and install dependencies:
-
 ```bash
 make develop
 ```
 
 ### 🐳 Run Dev Containers
 
-To launch Redis and PostgreSQL containers for development:
-
 ```bash
 make local
 ```
 
-To stop and remove dev containers:
+To stop:
 
 ```bash
 make local_down
@@ -59,38 +56,33 @@ make local_down
 
 ### 🏃 Start the Bot
 
-To run the bot locally (via aiomisc entrypoint):
-
 ```bash
 make app
 ```
 
-### 📊 Code Quality
+### 📊 Migrations
+
+```bash
+make local-apply-migrations     # Apply
+make local-create-migrations    # Generate
+make local-delete-migrations    # Delete all
+```
+
+---
+
+## 📊 Code Quality
 
 ```bash
 make lint    # run ruff with autofix
-make mypy    # run mypy static type checker
+make mypy    # run static type checks
 ```
 
-### 📈 Apply Database Migrations
+---
 
-Make sure your `.env` is configured and containers are running.
+## 🥪 Testing
 
-```bash
-make local-apply-migrations
-```
-
-### 🏗️ Create New Migration
-
-```bash
-make local-create-migrations
-```
-
-To delete all generated versions:
-
-```bash
-make local-delete-migrations
-```
+* `pytest`, `pytest-asyncio`, `pytest-cov`
+* Test factories via `polyfactory`
 
 ---
 
@@ -98,26 +90,91 @@ make local-delete-migrations
 
 Example `.env.dev`:
 
+```env
+APP_DB_USER=mrfixit
+APP_DB_PASSWORD=mrfixit
+APP_DB_NAME=mrfixit
+APP_DB_HOST=localhost
+APP_DB_PORT=5432
+
+APP_REDIS_HOST=localhost
+APP_REDIS_PORT=6379
+APP_REDIS_PASSWORD=mrfixit
+
+APP_TG_BOT_TOKEN=...
+APP_TG_ALLOWED_CHAT_ID=...
+```
+
 ---
 
-## 🥪 Testing
+## 🚢 DockerHub, CI/CD & Autodeploy
 
-* Unit tests with `pytest` and `pytest-asyncio`
-* Test factories with `polyfactory`
-* Coverage reporting via `pytest-cov` and `coverage`
+### ⟳ GitHub Actions Workflow
 
----
+CI/CD is handled via GitHub Actions:
 
-## 📦 Tech Stack
+* PR triggers `lint` and `test` jobs
+* Merge to `main` triggers:
 
-* Python 3.12
-* aiogram 3.x + aiogram-dialog
-* PostgreSQL + asyncpg + SQLAlchemy 2
-* Redis
-* aiomisc (scheduling, cron jobs)
-* Dishka (DI container)
-* Poetry + Make
-* Docker / Docker Compose
+  * Docker image build and push to [DockerHub](https://hub.docker.com/repository/docker/ertiops/mrfixit)
+  * Auto-deploy on VPS via [Watchtower](https://containrrr.dev/watchtower/)
+
+### 🛆 DockerHub
+
+Latest production image is available here:
+
+```
+docker pull ertiops/mrfixit:latest
+```
+
+### ⚙️ GitHub Secrets
+
+The following secrets are used in CI:
+
+* `DOCKERHUB_USERNAME`
+* `DOCKERHUB_TOKEN`
+
+They are used to authenticate and push images.
+
+### 🛡️ Autodeploy with Watchtower
+
+On the server, Watchtower is configured to track `ertiops/mrfixit:latest`.
+
+Watchtower checks periodically and restarts the container when a new image is pushed:
+
+```yaml
+watchtower:
+  image: containrrr/watchtower
+  container_name: watchtower
+  restart: unless-stopped
+  volumes:
+    - /var/run/docker.sock:/var/run/docker.sock
+  command: --interval 60
+```
+
+The `mrfixit` container is defined like this:
+
+```yaml
+services:
+  mrfixit:
+    image: ertiops/mrfixit:latest
+    container_name: mrfixit_app
+    env_file:
+      - .env
+    ports:
+      - "8001:8000"
+    restart: unless-stopped
+```
+
+### 🧠 Apply Migrations Automatically
+
+On container startup, the bot will apply DB migrations automatically using:
+
+```bash
+.venv/bin/python -m mrfixit.adapters.database upgrade head
+```
+
+No `entrypoint.sh` is needed — this logic is built into the image.
 
 ---
 
@@ -127,12 +184,13 @@ Example `.env.dev`:
 mrfixit/
 ├─ adapters/       # DB, Redis, DI, storages, migrations
 ├─ application/    # Shared app config, exceptions
-├─ domain/        # Entities, services, interfaces, utils
+├─ domain/         # Entities, services, interfaces, utils
 ├─ presenters/     # Telegram bot: dialogs, handlers, messages
-tests/          # Unit tests, test utils, factories
-Makefile        # Development scripts
+tests/             # Unit tests, test utils, factories
+Makefile           # Development scripts
 ...
 ```
+
 ---
 
 ## 🧑‍💻 Author
