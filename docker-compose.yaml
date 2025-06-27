@@ -38,7 +38,7 @@ services:
       restart: unless-stopped
       volumes:
         - /var/run/docker.sock:/var/run/docker.sock
-      command: --cleanup --interval 30 --include-restarting
+      command: --cleanup --interval 30 --include-restarting --label-enable
 
 volumes:
   postgres_data:
