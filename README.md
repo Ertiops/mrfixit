@@ -22,7 +22,7 @@ Designed for staff and technical personnel in environments like escape room proj
 
 ---
 
-## Ὠ0 Functional Overview
+## 🚀 Functional Overview
 
 **User roles**: Staff members and technical team.
 **Core capabilities**:
