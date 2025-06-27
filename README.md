@@ -119,7 +119,7 @@ CI/CD is handled via GitHub Actions:
   * Docker image build and push to [DockerHub](https://hub.docker.com/repository/docker/ertiops/mrfixit)
   * Auto-deploy on VPS via [Watchtower](https://containrrr.dev/watchtower/)
 
-### 🛆 DockerHub
+### 🐳 DockerHub
 
 Latest production image is available here:
 
