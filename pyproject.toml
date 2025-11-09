@@ -21,6 +21,7 @@ alembic = "^1.16.1"
 asyncpg = "^0.30.0"
 uvloop = "^0.21.0"
 croniter = "^6.0.0"
+greenlet = "^3.2.4"
 
 
 [tool.poetry.group.dev.dependencies]
